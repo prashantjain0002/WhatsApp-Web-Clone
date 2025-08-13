@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import connectDB from "../config/db.js";
-import { processPayload } from "../controllers/webhookController.js";
+import { processPayload } from "../controllers/processPayloadController.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
