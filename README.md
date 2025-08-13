@@ -47,7 +47,7 @@ whatsapp-web-clone/
 │   ├── controllers/        # API route controllers
 │   ├── models/             # Mongoose models
 │   ├── routes/             # API routes
-│   └── server.js           # Main backend entry
+│   └── index.js           # Main backend entry
 │
 ├── frontend/               # React App
 │   ├── components/         # UI components
