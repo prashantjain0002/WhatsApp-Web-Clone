@@ -1,66 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import ConversationView from "./components/ConversationView";
-import { MessageSquare, Lock } from "lucide-react"; // ✅ Added Lock icon
+import { MessageSquare, Lock } from "lucide-react";
+import { fetchConversations, sendMessage } from "./services/messageService";
 
 const WhatsAppClone = () => {
   const [selectedChat, setSelectedChat] = useState(null);
+  const [chats, setChats] = useState([]);
 
-  const chats = [
-    {
-      id: 1,
-      name: "Prashant Jain (You)",
-      message: "JavaScript hand Written Notes.p...",
-      time: "Yesterday",
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-      hasAttachment: true,
-      isOnline: false,
-      lastSeen: "2 hours ago",
-    },
-    {
-      id: 2,
-      name: "The place of learning 2.1",
-      message: "~Sunil Kumar: 📷 Image",
-      time: "11:19 AM",
-      avatar:
-        "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=40&h=40&fit=crop&crop=face",
-      isOnline: true,
-    },
-    {
-      id: 3,
-      name: "Anand Waghel (UEC)",
-      message: "Or kya chal rha h",
-      time: "10:46 AM",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-      hasCheckmark: true,
-      isOnline: false,
-      lastSeen: "1 hour ago",
-    },
-    {
-      id: 4,
-      name: "10th,12th Open admission Job...",
-      message: "Sanjeev: फीस एक एप्लीकेशन न निचे...",
-      time: "09:57 AM",
-      avatar:
-        "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=40&h=40&fit=crop&crop=face",
-      isGroup: true,
-      isOnline: true,
-    },
-    {
-      id: 5,
-      name: "Ronak",
-      message: "Hm",
-      time: "09:54 AM",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-      isOnline: true,
-    },
-  ];
+  useEffect(() => {
+    const loadChats = async () => {
+      try {
+        const data = await fetchConversations();
+        setChats(data);
+      } catch (error) {
+        console.error("Error loading chats:", error);
+      }
+    };
+    loadChats();
+  }, []);
 
   const handleChatSelect = (chat) => {
-    console.log("Chat selected:", chat);
     setSelectedChat(chat);
   };
 
@@ -68,13 +28,28 @@ const WhatsAppClone = () => {
     setSelectedChat(null);
   };
 
-  const handleSendMessage = (message) => {
-    console.log("Sending message:", message);
-  };
+  const handleSendMessage = async (messageText) => {
+    if (!selectedChat) return;
+    try {
+      const newMessage = await sendMessage(selectedChat.wa_id, messageText);
 
+      // Update chat messages locally (basic version)
+      setChats((prev) =>
+        prev.map((c) =>
+          c.wa_id === selectedChat.wa_id
+            ? { ...c, messages: [...(c.messages || []), newMessage] }
+            : c
+        )
+      );
+    } catch (err) {
+      console.error("Error sending message:", err);
+    }
+  };
+  
+  
   return (
     <div className="flex h-screen bg-gray-100 relative">
-      {/* Sidebar */}
+      {/* Sidebar */}{" "}
       <div
         className={`${
           selectedChat ? "hidden md:flex" : "flex"
@@ -86,7 +61,6 @@ const WhatsAppClone = () => {
           onChatSelect={handleChatSelect}
         />
       </div>
-
       {/* Main Content or Conversation */}
       <div
         className={`${
@@ -108,6 +82,8 @@ const WhatsAppClone = () => {
 };
 
 export default WhatsAppClone;
+
+// MainContent component unchanged
 
 // ✅ Moved MainContent as a named export here
 export const MainContent = () => {

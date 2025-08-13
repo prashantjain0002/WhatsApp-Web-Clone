@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Phone,
   Video,
@@ -9,66 +9,52 @@ import {
   Mic,
   Send,
 } from "lucide-react";
-import Message from "./Message"; 
+import Message from "./Message";
+
+const ME = "918329446654"; 
 
 const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
-  if (!selectedChat) return null;
-
   const [message, setMessage] = useState("");
+  const [localMessages, setLocalMessages] = useState([]);
   const endRef = useRef(null);
 
-  const messages = [
-    { type: "date", content: "Sunday" },
-    {
-      type: "call",
-      content: "Voice call",
-      details: "Accepted on another device",
-      timestamp: "09:28 PM",
-    },
-    { type: "date", content: "Today" },
-    {
-      type: "status",
-      content:
-        "Jab milega tab esko ghumne jane ka plan bana hota hai or jata bhi nahi hai 😭😭",
-      timestamp: "09:12 AM",
-    },
-    { type: "received", content: "Kon h ye 😁😁", timestamp: "09:12 AM" },
-    { type: "received", content: "Abhishek hai", timestamp: "09:53 AM" },
-    {
-      type: "received",
-      content: "Tere ko dikha nhi ky",
-      timestamp: "09:53 AM",
-    },
-    {
-      type: "sent",
-      content: "Laga hi tha",
-      timestamp: "09:53 AM",
-      isRead: true,
-    },
-    {
-      type: "received",
-      content: "Tere ko dikha nhi ky",
-      timestamp: "09:54 AM",
-    },
-    {
-      type: "sent",
-      content: "Arr usne shakal chupa li thi na",
-      timestamp: "09:54 AM",
-      isRead: true,
-    },
-    { type: "received", content: "Hm", timestamp: "09:54 AM" },
-  ];
 
-  // Scroll to bottom on messages change
+  useEffect(() => {
+    if (selectedChat?.messages) {
+      setLocalMessages(selectedChat.messages);
+    }
+  }, [selectedChat]);
+
+  // Scroll to bottom whenever messages change
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [localMessages]);
 
-  // Handle send
-  const handleSend = () => {
-    if (message.trim()) {
-      onSendMessage(message);
-      setMessage("");
+  const handleSend = async () => {
+    if (!message.trim()) return;
+
+    const now = Math.floor(Date.now() / 1000);
+
+    // Create a local temp message
+    const newMessage = {
+      id: `temp-${now}`,
+      from: ME,
+      to: selectedChat.wa_id || null,
+      text: message,
+      timestamp: now,
+      status: "sent", 
+    };
+
+  
+    setLocalMessages((prev) => [...prev, newMessage]);
+    setMessage("");
+
+
+    try {
+      await onSendMessage(message);
+    } catch (err) {
+      console.error("Send failed:", err);
+     
     }
   };
 
@@ -79,17 +65,19 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
     }
   };
 
-  // ----------------- RENDER -----------------
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Conversation Header */}
+      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-white text-black shadow">
         <div className="flex items-center flex-1">
           <button onClick={onBack} className="p-1 rounded-full mr-2">
             <ArrowLeft size={22} />
           </button>
           <img
-            src={selectedChat.avatar}
+            src={
+              selectedChat.avatar ||
+              "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+            }
             alt={selectedChat.name}
             className="w-10 h-10 rounded-full object-cover"
           />
@@ -112,7 +100,7 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
         </div>
       </div>
 
-      {/* Message List */}
+      {/* Messages */}
       <div
         className="flex-1 overflow-y-auto py-2"
         style={{
@@ -121,14 +109,14 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
         }}
       >
         <div className="space-y-1 px-2">
-          {messages.map((msg, i) => (
-            <Message key={i} message={msg} />
+          {localMessages.map((msg, i) => (
+            <Message key={msg.id || i} message={msg} meNumber={ME} />
           ))}
           <div ref={endRef} />
         </div>
       </div>
 
-      {/* Message Input */}
+      {/* Input */}
       <div className="bg-[#F6F6F6] px-2 py-3">
         <div className="flex items-center space-x-2">
           <button className="p-2 hover:bg-gray-200 rounded-full">

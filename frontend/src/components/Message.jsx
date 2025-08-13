@@ -1,66 +1,66 @@
 import React from "react";
-import { CheckCheck, Phone } from "lucide-react";
+import { Check, CheckCheck } from "lucide-react";
+
+const ME = "918329446654"; // your own number for comparison
 
 const Message = ({ message }) => {
-  if (message.type === "date") {
+
+  const isMe = message.from === ME;
+
+  const formatTime = (ts) => {
+    if (!ts) return "";
+    const date = new Date(ts * 1000);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  // Decide which tick(s) to show for my messages based on status
+  const renderTicks = (status) => {
+    switch (status) {
+      case "sent":
+        return <Check size={15} className="text-gray-500" />;
+      case "delivered":
+        return <CheckCheck size={15} className="text-gray-500" />;
+      case "read":
+        return <CheckCheck size={15} className="text-blue-500" />;
+      default:
+        return null;
+    }
+  };
+
+  // Bubble for sent messages
+  if (isMe) {
     return (
-      <div className="flex justify-center my-3">
-        <div className="bg-white px-3 py-1 rounded text-xs text-[#808080] shadow">
-          {message.content}
+      <div className="flex justify-end mb-1 px-2">
+        <div
+          className="bg-[#DCF8C6] text-black px-3 py-2 rounded-2xl max-w-sm shadow"
+          style={{ borderBottomRightRadius: "5px" }}
+        >
+          <div className="text-sm">{message.text}</div>
+          <div className="flex items-center justify-end mt-1 space-x-1">
+            <span className="text-xs text-gray-600">
+              {formatTime(message.timestamp)}
+            </span>
+            {renderTicks(message.status)}
+          </div>
         </div>
       </div>
     );
   }
-  if (message.type === "call") {
-    return (
-      <div className="flex justify-center my-2">
-        <div className="bg-white px-4 py-2 rounded text-xs flex items-center shadow border border-gray-200">
-          <Phone size={16} className="text-[#25D366]" />
-          <span className="ml-2">
-            {message.content} — {message.details}
-          </span>
-        </div>
-      </div>
-    );
-  }
-  if (message.type === "status") {
-    return (
-      <div className="flex justify-center my-2">
-        <div className="bg-[#F4F4F4] px-4 py-1 rounded text-xs text-[#4A4A4A] border shadow max-w-lg text-center">
-          {message.content}
-        </div>
-      </div>
-    );
-  }
-  const sentBubble = (
-    <div className="flex justify-end mb-1 px-2">
-      <div
-        className="bg-[#DCF8C6] text-black px-3 py-2 rounded-2xl rounded-br-sm max-w-sm shadow"
-        style={{ borderBottomRightRadius: "5px" }}
-      >
-        <div className="text-sm">{message.content}</div>
-        <div className="flex items-center justify-end mt-1">
-          <span className="text-xs text-gray-600">{message.timestamp}</span>
-          <span className="text-xs text-blue-400 ml-1"> <CheckCheck size={15}/></span>
-        </div>
-      </div>
-    </div>
-  );
-  const receivedBubble = (
+
+  // Bubble for received messages
+  return (
     <div className="flex justify-start mb-1 px-2">
       <div
-        className="bg-white text-black px-3 py-2 rounded-2xl rounded-bl-sm max-w-sm shadow"
+        className="bg-white text-black px-3 py-2 rounded-2xl max-w-sm shadow"
         style={{ borderBottomLeftRadius: "5px" }}
       >
-        <div className="text-sm">{message.content}</div>
+        <div className="text-sm">{message.text}</div>
         <div className="text-xs text-gray-600 mt-1 text-right">
-          {message.timestamp}
+          {formatTime(message.timestamp)}
         </div>
       </div>
     </div>
   );
-  if (message.type === "sent") return sentBubble;
-  if (message.type === "received") return receivedBubble;
-  return null;
 };
+
 export default Message;
