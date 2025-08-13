@@ -19,7 +19,9 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
     };
 
     const lastMessage =
-      chat.messages && chat.messages.length > 0 ? chat.messages[0] : null;
+      chat.messages && chat.messages.length > 0
+        ? chat.messages[chat.messages.length - 1]
+        : null;
 
     const renderTicks = (status) => {
       switch (status) {
