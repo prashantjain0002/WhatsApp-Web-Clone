@@ -24,7 +24,7 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
       setLocalMessages(selectedChat.messages);
       setTimeout(() => {
         endRef.current?.scrollIntoView({ behavior: "auto" });
-      }, 50); // small delay to ensure DOM is painted
+      }, 50); 
     }
   }, [selectedChat]);
 
