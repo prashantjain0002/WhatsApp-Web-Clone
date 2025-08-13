@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import Header from "./Header";
 import MessageBubble from "./MessageBubble";
 
 const ME = "918329446654"; // Your number (mock for frontend)
@@ -56,8 +55,6 @@ export default function ChatWindow({ conversation }) {
 
   return (
     <div className="flex-1 flex flex-col h-screen">
-      <Header conversation={conversation} />
-
       {/* Chat background */}
       <div
         className="flex-1 overflow-auto bg-[#efeae2] px-4"
