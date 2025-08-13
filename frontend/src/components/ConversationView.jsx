@@ -11,21 +11,24 @@ import {
 } from "lucide-react";
 import Message from "./Message";
 
-const ME = "918329446654"; 
+const ME = "918329446654";
 
 const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
   const [message, setMessage] = useState("");
   const [localMessages, setLocalMessages] = useState([]);
   const endRef = useRef(null);
 
-
+  // Load chat messages when a new chat is opened & scroll to bottom
   useEffect(() => {
     if (selectedChat?.messages) {
       setLocalMessages(selectedChat.messages);
+      setTimeout(() => {
+        endRef.current?.scrollIntoView({ behavior: "auto" });
+      }, 50); // small delay to ensure DOM is painted
     }
   }, [selectedChat]);
 
-  // Scroll to bottom whenever messages change
+  // Scroll to bottom when new messages are appended
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [localMessages]);
@@ -35,26 +38,23 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
 
     const now = Math.floor(Date.now() / 1000);
 
-    // Create a local temp message
+    // temp local message for instant UI feedback
     const newMessage = {
       id: `temp-${now}`,
       from: ME,
       to: selectedChat.wa_id || null,
       text: message,
       timestamp: now,
-      status: "sent", 
+      status: "sent",
     };
 
-  
     setLocalMessages((prev) => [...prev, newMessage]);
     setMessage("");
 
-
     try {
-      await onSendMessage(message);
+      await onSendMessage(message); // parent will update backend
     } catch (err) {
       console.error("Send failed:", err);
-     
     }
   };
 
@@ -65,12 +65,15 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
     }
   };
 
+  if (!selectedChat) return null;
+
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white text-black shadow">
+      {/* Header - always visible */}
+      <div className="flex items-center justify-between px-4 py-3 bg-white text-black shadow flex-shrink-0">
         <div className="flex items-center flex-1">
-          <button onClick={onBack} className="p-1 rounded-full mr-2">
+          <button onClick={onBack} className="p-1 rounded-full mr-2 md:hidden">
+            {/* md:hidden = show back button only on phone */}
             <ArrowLeft size={22} />
           </button>
           <img
@@ -117,7 +120,7 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
       </div>
 
       {/* Input */}
-      <div className="bg-[#F6F6F6] px-2 py-3">
+      <div className="bg-[#F6F6F6] px-2 py-3 flex-shrink-0">
         <div className="flex items-center space-x-2">
           <button className="p-2 hover:bg-gray-200 rounded-full">
             <Smile size={22} />
@@ -127,11 +130,11 @@ const ConversationView = ({ selectedChat, onBack, onSendMessage }) => {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder="Type a message"
               className="w-full px-4 py-2 rounded-full bg-white border border-gray-300 focus:outline-none focus:border-[#25D366] text-sm"
             />
-            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-600">
+            <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-600">
               <Paperclip size={18} />
             </button>
           </div>
