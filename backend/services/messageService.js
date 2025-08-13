@@ -23,3 +23,17 @@ export async function getGroupedMessages(ourNumber) {
 
   return Object.values(grouped);
 }
+
+export async function createMessage(ourNumber, wa_id, text) {
+  const newMessage = {
+    id: `demo-${Date.now()}`,
+    from: ourNumber,
+    to: wa_id,
+    timestamp: Math.floor(Date.now() / 1000),
+    text,
+    status: "sent",
+  };
+
+  await ProcessedMessage.create(newMessage);
+  return newMessage;
+}
