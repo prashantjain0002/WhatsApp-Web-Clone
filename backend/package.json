@@ -2,13 +2,14 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["whatsapp", "webhook", "mongodb", "nodejs", "es6"],
+  "author": "Prashant Jain",
   "license": "ISC",
-  "description": "",
+  "description": "WhatsApp Business API Webhook Payload Processor",
   "dependencies": {
     "express": "^4.18.2",
     "mongoose": "^8.0.3",
