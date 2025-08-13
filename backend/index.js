@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import helmet from "helmet";
+import messageRoutes from "./routes/messageRoutes.js";
 
 dotenv.config();
 
@@ -18,6 +19,9 @@ app.use(cors());
 // Body parser
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use("/api/messages", messageRoutes);
 
 
 const PORT = process.env.PORT || 5000;
