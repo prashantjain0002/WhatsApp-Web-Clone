@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000/api";  
+// const API_BASE_URL = "http://localhost:3000/api";  
+const API_BASE_URL = "https://whatsapp-web-clone-s52h.onrender.com/api";  
 
 export const fetchConversations = async () => {
   try {
