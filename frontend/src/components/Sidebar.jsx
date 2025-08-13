@@ -8,8 +8,6 @@ import {
 } from "lucide-react";
 
 const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
-  // Single chat item
-
   const ChatItem = ({ chat, isSelected, onClick }) => {
     const formatTime = (timestamp) => {
       if (!timestamp) return "";
@@ -20,31 +18,17 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
       });
     };
 
-    // Get the last message if exists
     const lastMessage =
       chat.messages && chat.messages.length > 0 ? chat.messages[0] : null;
 
-    // Decide tick icon based on message status
     const renderTicks = (status) => {
       switch (status) {
         case "sent":
-          return (
-            <span className="text-gray-400">
-              <Check size={15} />
-            </span>
-          );
+          return <Check size={15} className="text-gray-400" />;
         case "delivered":
-          return (
-            <span className="text-gray-400">
-              <CheckCheck size={15} />
-            </span>
-          );
+          return <CheckCheck size={15} className="text-gray-400" />;
         case "read":
-          return (
-            <span className="text-blue-500">
-              <CheckCheck size={15} />
-            </span>
-          );
+          return <CheckCheck size={15} className="text-blue-500" />;
         default:
           return null;
       }
@@ -57,7 +41,7 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
         }`}
         onClick={() => onClick(chat)}
       >
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <img
             src={
               chat.avatar ||
@@ -83,9 +67,7 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
 
           <div className="flex items-center mt-1">
             <p className="text-sm text-gray-600 truncate flex items-center gap-1">
-              {lastMessage &&
-                lastMessage.status &&
-                renderTicks(lastMessage.status)}
+              {lastMessage?.status && renderTicks(lastMessage.status)}
               {lastMessage ? lastMessage.text : ""}
             </p>
           </div>
@@ -94,7 +76,6 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
     );
   };
 
-  // Chat list with multiple items
   const ChatList = ({ chats, selectedChat, onChatSelect }) => (
     <div className="flex-1 overflow-y-auto">
       {chats.map((chat) => (
@@ -109,10 +90,20 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
   );
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+    <div
+      className="
+        bg-white border-r border-gray-200 
+        flex flex-col 
+        w-full md:w-80 
+        h-full max-h-screen 
+      "
+    >
+      {/* Header */}
       <div className="flex items-center justify-between p-4 bg-gray-50 border-b border-gray-200">
-        <h1 className="text-xl font-semibold text-gray-800">Chats</h1>
-        <div className="flex items-center space-x-2">
+        <h1 className="text-lg md:text-xl font-semibold text-gray-800">
+          Chats
+        </h1>
+        <div className="flex items-center space-x-1 md:space-x-2">
           <button className="p-2 hover:bg-gray-200 rounded-full">
             <MessageSquare size={20} className="text-gray-600" />
           </button>
@@ -121,11 +112,13 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
           </button>
         </div>
       </div>
+
+      {/* Search Bar */}
       <div className="p-3 border-b border-gray-100">
         <div className="relative">
           <Search
             size={16}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <input
             type="text"
@@ -134,6 +127,8 @@ const Sidebar = ({ chats, selectedChat, onChatSelect }) => {
           />
         </div>
       </div>
+
+      {/* Chat List */}
       <ChatList
         chats={chats}
         selectedChat={selectedChat}
